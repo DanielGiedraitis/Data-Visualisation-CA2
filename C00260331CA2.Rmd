@@ -1,0 +1,491 @@
+---
+title: "Road Vehicle Collisions"
+author: "Daniel Giedraitis"
+student_id: "C00250331"
+programme_title: "Software Development"
+programme_code: "CW_KCSOF_B"
+module_title: "Data Visualisation"
+lecturer_name: "Agnes Maciocha"
+submission_date: "2024-04-17"
+word_count: "2000"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+library(tidyr)
+library(purrr)
+
+col_pal <- c("#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf")
+```
+
+# Introduction
+The unsettling reality of road vehicle collisions strikes a chord with many of us. We've all experienced those heart-wrenching moments—the sudden blare of sirens, the flashing lights, and the sinking feeling knowing that someone's been hurt on the road. But the impact of these incidents extend well beyond the immediate scene, sending shockwaves through our communities, disrupting lives, and leaving a lasting imprint on our collective consciousness. It's a toll that extends beyond individuals and families, affecting the very fabric of our society—our healthcare systems, transportation networks, and economic vitality. Indeed, the burden is heavy, and it demands our full attention.
+
+In embarking on this analysis, I am driven by a profound desire to delve into the data behind these collisions. But this work is more than just crunching numbers, it's about unraveling the complex patterns of factors that contribute to these incidents. My goal is to uncover patterns, identify trends, and gain insights that can help us navigate the complexities of road safety. Through the lens of data visualization, I seek to present these findings in a way that resonates with policymakers, transportation authorities, and everyday citizens. My goal is simple yet ambitious, to create meaningful conversations and encourage action toward creating safer roads for everyone.
+
+
+# Research Questions / Problem
+As I delve into the complexities of road vehicle collisions, I'm faced with a number of challenging questions:
+
+**1. Primary Factors Driving Collisions:** What are the primary factors propelling road vehicle collisions, and to what extent do they contribute to the overall accident rates? Delving into the root causes of these incidents is essential for developing effective prevention strategies and interventions.
+
+**2. Temporal Influences on Collision Frequencies:** How do temporal factors, such as the time of day, day of the week,  and month of the year affect collision frequency and severity? Understanding these temporal patterns is crucial for identifying peak periods and seasonal variations, which will allow for more focused accident prevention strategies.
+
+**3. Distribution of Injury Types:** What insights can be gleaned from the distribution of injury types resulting from collisions, and how do these insights inform emergency response protocols and healthcare resource allocation? Understanding the severity and frequency of different types of injuries allows us to tailor emergency response strategies and allocate healthcare resources more effectively.
+
+**4. Urban vs. Rural Collision Patterns:** Are there noticeable differences in collision patterns between urban and rural areas, and what are the implications of these disparities for infrastructure planning and traffic management? Investigating the differences in collision occurrences between urban and rural environments sheds light on the unique challenges each setting presents, guiding the development of location-specific interventions.
+
+These questions are driving my exploration, guiding me as I navigate through the data to uncover meaningful insights.
+
+# Rationale
+The reason I'm focusing on road vehicle collisions is simple: they have a significant and far-reaching impact on our communities, extending well beyond the immediate scene of the accident. Each year, millions of lives are disrupted, families are torn apart, and individuals suffer injuries or fatalities due to road traffic incidents. This isn't just a statistic—it's a ugly reality that demands our attention and action.
+
+With road traffic injuries and fatalities imposing such a heavy toll on society, there's simply no room for carelessness. We cannot afford to turn a blind eye to this critical public health and safety issue. Instead, we must confront it head-on with evidence-based strategies aimed at preventing unnecessary harm and suffering.
+
+Data visualization serves as a powerful tool in this ongoing battle against road vehicle collisions. Its ability to display complex datasets into digestible insights makes it uniquely suited to our purpose. By using visual tools to express trends, patterns, and correlations within collision data, I aim to bridge the gap between raw data and actionable information.
+
+Through compelling visualizations, we can empower decision-makers across various sectors to develop targeted interventions and allocate resources where they are most needed. Whether it's identifying high-risk areas for infrastructure improvements, implementing public awareness campaigns to promote safe driving behaviors, or enhancing law enforcement efforts to reduce reckless driving, data visualization provides us with the insights necessary to drive meaningful change.
+
+By shining light on the underlying factors contributing to road vehicle collisions, we can inform evidence-based decision-making and policy formulation. This proactive approach not only addresses the immediate challenges posed by road traffic incidents but also lays the groundwork for long-term solutions aimed at creating safer, more resilient communities.
+
+In essence, my interest in road vehicle collisions stems from a sense of duty, recognizing the significant impact these incidents have on individuals, families, and society as a whole. Through data visualization and analysis, I hope to amplify the voices of those affected by road traffic injuries and fatalities, pushing for change and working toward a future in which such tragedies are reduced, if not completely eliminated.
+
+
+# Data Presentation
+My analysis is supported by a rich dataset 53,945 rows and 11 rows providing a detailed compilation of information related to common factors influencing road accidents, such as collision severity, weather conditions, road types, and contributing elements, offering valuable insights for the analysis and enhancement of overall road safety measures. Each offering a unique lens through which to view road vehicle collisions:
+
+- **Year:** Provides temporal context, allowing us to analyze trends and changes over time.
+
+- **Month:** Offers insights into seasonal variations and trends in collision frequencies.
+
+- **Weekend** (Weekday or Weekend): Distinguishes between collisions occurring on weekdays versus weekends, highlighting potential differences in driving behaviors and risk factors.
+
+- **Hour:** Indicates the time of day when collisions occur, facilitating analyses of temporal patterns and peak traffic hours.
+
+- **Collision Type:** Classifies collisions into categories such as rear-end, head-on, and sideswipe, providing insights into the nature and severity of collisions.
+
+- **Injury Type:** Describes the types of injuries sustained by individuals involved in collisions, ranging from minor bruises to severe trauma.
+
+- **Primary Factor:** Identifies the primary contributing factor cited in collision reports, such as speeding, distracted driving, or adverse weather conditions.
+
+- **Reported_Location, Latitude, Longitude:** Geographic coordinates pinpointing the location of collisions, enabling spatial analyses and visualization of collision hotspots.
+
+With these variables at my disposal, I aim to paint a comprehensive picture of road vehicle collisions, uncovering hidden trends, patterns, and insights that can inform evidence-based decision-making and policy creation.
+
+# Data Manipulation
+Before delving into the realm of data visualization and analysis, it is important to preprocess the dataset to ensure its integrity, consistency, and suitability for exploration. This involves a series of data manipulation steps aimed at cleaning, transforming, and aggregating the raw data to facilitate meaningful insights and actionable conclusions.
+
+**Key data manipulation tasks may include:**
+
+- **Duplicate Removal:** Identifying and removing duplicate records to eliminate redundancy and ensure data accuracy.
+
+- **Missing Value Imputation:** Addressing missing or incomplete data points through imputation techniques such as mean substitution, predictive modeling, or deletion based on data characteristics and analysis requirements.
+
+- **Variable Standardization:** Standardizing variable formats and units to enhance comparability and facilitate cross-referencing with external datasets or industry standards.
+
+- **Categorical Encoding:** Converting categorical variables into numerical or ordinal representations to enable quantitative analysis and modeling.
+
+By meticulously preparing the dataset through these manipulation steps, I lay a solid foundation for later visualization and analysis, reducing the risk of incorrect conclusions or misinterpretations caused  from data quality issues.
+
+
+# Data Analysis and Visualization
+Armed with a cleansed and preprocessed dataset, I embark on a visual journey through the world of road vehicle collisions, leveraging the expressive power of data visualization to uncover insights, trends, and patterns hidden within the data. Through a diverse array of visualization techniques, I aim to transform raw data into actionable knowledge, empowering stakeholders to make informed decisions and enact meaningful change.
+
+My analysis encompasses a wide spectrum of visualizations, each offering a unique perspective on collision data:
+
+- **Temporal Analysis:** I investigate the temporal element by dissecting collision frequencies over various time intervals, uncovering complex temporal patterns, determining peak times, recognizing seasonal fluctuations, and detecting ongoing patterns in collision frequencies. This analysis is visualized using bar plots that indicate temporal fluctuations in collision occurrences.
+
+- **Factor Analysis:** Engaging in a deep dive into the factors shaping collision occurrences, I investigated the complex interaction of variables, identifying the primary factors driving collisions and unraveling their intricate dynamics. This analysis is visualized through bar plots and pie charts, showcasing the frequency distribution of collision factors.
+
+- **Injury Distribution Analysis:** By examining the distribution of injury types resulting from collisions, we get important insights that drive emergency response methods and healthcare resource allocation, determining the number of different injury types and their implications. This analysis is visualized through bar plots and pie charts, illustrating the distribution of injury types.
+
+Through these visualizations, I aim to engage stakeholders on both an emotional and rational level, fostering empathy, awareness, and a sense of urgency in addressing the many challenges posed by road vehicle collisions.
+
+
+
+
+```{r}
+# Read the dataset into R
+df <- read_excel("new dataset.xlsx")
+print(head(df))
+```
+
+
+```{r}
+# Check the structure of the dataset
+str(df)
+```
+
+
+```{r}
+# Remove duplicated records
+sum(duplicated(df))
+```
+
+
+```{r}
+# Remove duplicated records
+df <- distinct(df)
+```
+
+
+```{r}
+# Remove rows with missing values
+df <- na.omit(df)
+```
+
+
+```{r}
+# Convert hour to character, remove decimal point, and pad with zeros to make it four digits
+df$Hour <- sprintf("%04d", as.integer(df$Hour))
+
+# Insert colon to format hour as HH:MM
+df$Hour <- paste(substr(df$Hour, 1, 2), substr(df$Hour, 3, 4), sep = ":")
+
+# Convert to time format
+df$Hour <- as.POSIXct(df$Hour, format = "%H:%M")
+
+# Extract only time component
+df$Hour <- format(df$Hour, format = "%H:%M")
+
+print(head(df$Hour))
+```
+
+
+```{r}
+# Convert numeric month to month names
+df$Month <- month.name[df$Month]
+```
+
+
+```{r}
+# Convert day to weekday names
+df$Day <- weekdays(ISOdate(2000, 1, df$Day))
+```
+
+## Number of accidents by years, months, days and hours
+The analysis of collision frequencies over different time intervals provides valuable insights into temporal patterns. By visualizing the data, we can identify peak times, seasonal variations, and long-term trends in collision occurrences.
+```{r}
+# Generate a sequence of hours from 00:00 to 23:00
+hours <- sprintf("%02d:00", 0:23)
+
+group_list <- c("Year", "Month", "Day", "Hour")
+
+for (i in group_list) {
+  # Preprocess the data for each group
+  if (i == "Year") {
+    df_grouped <- df %>%
+      count(!!sym(i), name = "count") %>%
+      mutate(!!sym(i) := factor(!!sym(i)))
+  } else if (i == "Month") {
+    df_grouped <- df %>%
+      count(!!sym(i), name = "count") %>%
+      mutate(!!sym(i) := factor(!!sym(i), levels = month.name))
+  } else if (i == "Day") {
+    df_grouped <- df %>%
+      count(!!sym(i), name = "count") %>%
+      mutate(!!sym(i) := factor(!!sym(i), levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")))
+  } else {
+    df_grouped <- df %>%
+      count(!!sym(i), name = "count") %>%
+      mutate(!!sym(i) := factor(!!sym(i), levels = hours))
+  }
+
+  max_count <- max(df_grouped$count)
+  avg_count <- mean(df_grouped$count)  # Calculate average count
+
+  p <- ggplot(df_grouped, aes(x = !!sym(i), y = count, fill = ifelse(count == max_count, "orange", "darkgreen"))) +
+    geom_bar(stat = "identity") +
+    geom_hline(yintercept = avg_count, linetype = "dashed", color = "red") +  # Add average line
+    scale_fill_manual(values = c("darkgreen", "orange"), guide = FALSE) +
+    labs(title = paste("Number of accidents by", i),
+         x = "",
+         y = "Count") +
+    theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
+    NULL
+
+  print(p)
+}
+```
+
+```{r}
+# Group by `Weekend?` and count the occurrences
+grouped_week <- df %>%
+  count(`Weekend?`, name = "count")
+```
+
+## Number and rates of accidents on weekdays and weekends
+Understanding the distribution of accidents between weekdays and weekends is crucial for allocating resources and implementing targeted interventions. By comparing the number and rates of accidents on different days of the week, we can identify potential risk factors and tailor preventive measures accordingly.
+```{r}
+# Calculate percentages
+grouped_week <- grouped_week %>%
+  mutate(percent = count / sum(count) * 100)
+
+# Bar plot with counts for weekdays and weekends
+p1 <- ggplot(grouped_week, aes(x = `Weekend?`, y = count, fill = `Weekend?`)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Number of accidents on weekdays and weekends",
+       x = "",
+       y = "Count") +
+  geom_text(aes(label = paste0(round(percent, 2), "%")),
+            position = position_stack(vjust = 0.5),
+            size = 3, color = "black") +
+  theme(legend.position = "none")
+
+# Pie chart
+p2 <- ggplot(grouped_week, aes(x = "", y = percent, fill = `Weekend?`)) +
+  geom_bar(stat = "identity", width = 1) +
+  geom_text(aes(label = paste0(round(percent, 2), "%")),
+            position = position_stack(vjust = 0.5),
+            size = 3, color = "black") +
+  coord_polar("y") +
+  labs(title = "Percentage of accidents on weekdays and weekends",
+       x = NULL,
+       y = NULL) +
+  theme_void()
+
+# Print both plots
+print(p1)
+print(p2)
+```
+
+```{r}
+# Group by `Collision Type` and count the occurrences
+grouped_collision_type <- df %>%
+  count(`Collision Type`) %>%
+  rename(count = n)
+```
+
+## Numbers and rates of accident types
+Analyzing the distribution of accident types provides insights into the predominant causes and mechanisms underlying collisions. By visualizing the data, we can identify the most common types of accidents and prioritize interventions aimed at reducing their occurrence.
+```{r}
+# Bar plot for accident types
+p1 <- ggplot(grouped_collision_type, aes(x = `Collision Type`, y = count, fill = `Collision Type`)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Numbers of accident types",
+       x = "",
+       y = "Count") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Pie chart for collision types
+p2 <- ggplot(grouped_collision_type, aes(x = "", y = count, fill = `Collision Type`)) +
+  geom_bar(stat = "identity", width = 1) +
+  geom_text(aes(label = paste0(round(count / sum(count) * 100, 2), "%")),
+            position = position_stack(vjust = 0.5),
+            size = 3, color = "black") +
+  coord_polar("y") +
+  labs(title = "Percentage of accident types",
+       x = NULL,
+       y = NULL) +
+  theme_void()
+
+# Print both plots
+print(p1)
+print(p2)
+```
+```{r}
+# Calculate counts for each injury type
+grouped_injury_type <- df %>%
+  count(`Injury Type`) %>%
+  rename(count = n)
+```
+
+## Numbers and rates of injury types in accidents
+Examining the distribution of injury types resulting from accidents informs emergency response protocols and healthcare resource allocation. By visualizing the data, we can assess the severity and frequency of different types of injuries and implement measures to mitigate their impact.
+```{r}
+# Calculate percentage for pie chart
+grouped_injury_type <- grouped_injury_type %>%
+  mutate(percentage = count / sum(count) * 100)
+
+# Plot injury types as bar plot with percentage labels
+p_bar <- ggplot(grouped_injury_type, aes(x = `Injury Type`, y = count, fill = `Injury Type`)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(round(percentage, 1), "%")), 
+            position = position_stack(vjust = 0.5), 
+            size = 3, 
+            color = "black", 
+            vjust = -0.5) + # Adjust position of labels
+  labs(title = "Number of injury types",
+       x = "",
+       y = "Count") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+print(p_bar)
+
+# Plot injury types as pie chart with percentage labels
+p_pie <- ggplot(grouped_injury_type, aes(x = "", y = count, fill = `Injury Type`)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y", start = 0) +
+  geom_text(aes(label = paste0(`Injury Type`, "\n", round(percentage, 1), "%")), 
+            position = position_stack(vjust = 0.5), 
+            size = 3, 
+            color = "black", 
+            vjust = -0.5) + # Adjust position of labels
+  labs(title = "Number of injury types",
+       x = NULL,
+       y = NULL) +
+  theme_void() +
+  theme(legend.position = "right")
+
+print(p_pie)
+
+```
+```{r}
+# Group by Collision Type and Hour, then count occurrences
+grouped_Collision <- df %>%
+  count(`Collision Type`, Hour)
+```
+
+## Times of collision types
+Analyzing the times of collision types helps identify temporal patterns and risk factors associated with different types of collisions. By visualizing the data, we can determine peak hours for specific collision types and implement targeted interventions to reduce their occurrence.
+```{r}
+# Check the structure of grouped_Collision data frame
+str(grouped_Collision)
+
+# Verify column names
+colnames(grouped_Collision)
+
+# Check unique collision types
+unique_collision_types <- unique(grouped_Collision$`Collision Type`)
+
+# Iterate over unique collision types and plot
+plots <- map(unique_collision_types, function(i) {
+  # Filter data for the current collision type
+  collision_type <- grouped_Collision %>%
+    filter(`Collision Type` == i)
+  
+  # Calculate average count
+  avg_count <- mean(collision_type$n)
+  
+  # Determine the fill color based on count
+  max_count <- max(collision_type$n)
+  fill_color <- ifelse(collision_type$n == max_count, "orange", "darkblue")
+  
+  # Plot
+  p <- ggplot(collision_type, aes(x = Hour, y = n, fill = fill_color)) +
+    geom_bar(stat = "identity") +
+    geom_hline(yintercept = avg_count, color = "red", linetype = "dashed") +  # Add average line
+    labs(title = paste("Times of collision - (", i, ")", sep = ""),
+         x = "Hour",
+         y = "Count") +
+    theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
+    scale_fill_identity()  # Use fill color as specified
+  
+  # Print the plot
+  print(p)
+})
+```
+
+
+```{r}
+# Group by Injury Type and Hour, then count occurrences
+grouped_injury_types <- df %>%
+  count(`Injury Type`, Hour) %>%
+  rename(counts = n)
+
+head(grouped_injury_types)
+```
+
+## Times of injury for each injury type
+Examining the times of injury for each injury type provides insights into temporal trends and risk factors associated with different types of injuries. By visualizing the data, we can identify peak hours for specific injury types and develop strategies to prevent or minimize their occurrence.
+```{r}
+# Plot times of injury for each injury type
+unique_injury_types <- unique(grouped_injury_types$`Injury Type`)
+
+plots <- lapply(unique_injury_types, function(i) {
+  injury_type <- grouped_injury_types %>%
+    filter(`Injury Type` == i)
+  
+  avg_count <- mean(injury_type$counts)  # Calculate average count
+  
+  # Determine color based on count
+  p <- ggplot(injury_type, aes(x = Hour, y = counts, fill = ifelse(counts == max(counts), "purple", "orange"))) +
+    geom_bar(stat = "identity") +
+    geom_hline(yintercept = avg_count, linetype = "dashed", color = "red") +  # Add average line
+    labs(title = paste("Times of injury - (", i, ")", sep = ""),
+         x = "",
+         y = "Count") +
+    theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
+    scale_fill_manual(values = c("purple", "orange")) +  # Set colors
+    guides(fill = FALSE)  # Remove legend
+  
+  print(p)
+})
+
+
+```
+
+## Causes of accidents
+Identifying the primary factors contributing to accidents is essential for developing effective prevention strategies. By analyzing the data, we can pinpoint the most common causes of accidents and implement targeted interventions to address them.
+```{r}
+# Group by Primary Factor and count occurrences
+grouped_primary_factor <- df %>%
+  count(`Primary Factor`) %>%
+  arrange(desc(n)) %>%
+  head(10)
+
+avg_count <- mean(grouped_primary_factor$n)  # Calculate average count
+
+p <- ggplot(grouped_primary_factor, aes(x = reorder(`Primary Factor`, n), y = n)) +
+  geom_bar(stat = "identity", fill = "lightblue") +  # Change bar color to light blue
+  geom_hline(yintercept = avg_count, linetype = "dashed", color = "red") +  # Add average line
+  labs(title = "The top 10 causes of accidents",
+       x = "Primary Factor",
+       y = "Count") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  coord_flip() +  # Rotate the plot sideways
+  NULL
+
+print(p)
+
+```
+
+```{r}
+# Group by Collision Type and Primary Factor, then count occurrences
+grouped_colision_factors <- df %>%
+  count(`Collision Type`, `Primary Factor`)
+```
+
+## Top 5 causes of collisions for each collision type
+Analyzing the top causes of collisions for each collision type helps prioritize preventive measures and interventions. By visualizing the data, we can identify the primary factors contributing to different types of collisions and develop strategies to mitigate their impact.
+```{r}
+# Plot top 5 causes of collisions for each collision type
+unique_collision_types <- unique(grouped_colision_factors$`Collision Type`)
+
+plots <- lapply(unique_collision_types, function(i) {
+  grouped_collision <- grouped_colision_factors %>%
+    filter(`Collision Type` == i) %>%
+    arrange(desc(n)) %>%
+    head(5)
+  
+  avg_count <- mean(grouped_collision$n)  # Calculate average count
+  
+  p <- ggplot(grouped_collision, aes(x = reorder(`Primary Factor`, n), y = n)) +
+    geom_bar(stat = "identity", fill = "lightgreen") +  # Change bar color to light green
+    geom_hline(yintercept = avg_count, linetype = "dashed", color = "red") +  # Add average line
+    labs(title = paste("Top 5 causes of collisions - (", i, ")", sep = ""),
+         x = "Primary Factors",
+         y = "Count") +  # Swap x and y axis labels
+    theme(axis.text.y = element_text(angle = 0, hjust = 1)) +  # Rotate y-axis labels
+    coord_flip() +  # Rotate the plot sideways
+    NULL
+  
+  print(p)
+})
+```
+
+# Conclusions
+In conclusion, my analysis of road vehicle collisions highlights the importance of data-driven approaches in tackling complex societal issues. By harnessing the power of data visualization, I've gained valuable insights into the underlying causes, temporal patterns, spatial distributions, and injury outcomes associated with collisions, laying the groundwork for evidence-based interventions and policy reforms.
+
+Moving forward, it is important that we use these insights to drive positive change and develop a culture of road safety and responsible driving behavior. Whether through targeted infrastructure investments, public awareness campaigns, enhanced law enforcement efforts, or technological innovations in vehicle safety systems, there exists a multitude of avenues through which we can collectively work towards reducing the incidence and severity of road vehicle collisions.
+
+As I navigate the road ahead, I remain strong in my commitment to leveraging data and technology as catalysts for progress. Empowering communities, saving lives, and building a safer, more sustainable future for everyone is most important. By continuing to innovate and collaborate across sectors, we can implement comprehensive solutions that address the root causes of road vehicle collisions while also ensuring the safety of all road users.
+
